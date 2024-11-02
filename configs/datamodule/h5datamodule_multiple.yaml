@@ -2,8 +2,8 @@ _target_: src.datamodules.datamodules.MultipleDataModule
 
 defaults:
   - _self_
-  - loaders: default.yaml
-  - transforms: default.yaml
+  - loaders: default
+  - transforms: default
 
 # Choose labels tensor type in dataset based on loss type you use, e.g.:
 # - torch.nn.BCEWithLogitsLoss requires torch.FloatTensor

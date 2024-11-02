@@ -9,7 +9,7 @@ _target_: src.modules.single_module.SingleLitModule
 
 defaults:
   - _self_
-  - network: classification.yaml
+  - network: classification
 
 optimizer:
   _target_: torch.optim.AdamW

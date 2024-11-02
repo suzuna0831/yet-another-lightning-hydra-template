@@ -2,16 +2,22 @@ from typing import Any, List, Optional, Tuple
 
 import hydra
 import pyrootutils
-from omegaconf import DictConfig
-from pytorch_lightning import (
+from lightning import (
     Callback,
     LightningDataModule,
     LightningModule,
     Trainer,
     seed_everything,
 )
-from pytorch_lightning.loggers import LightningLoggerBase
+from lightning.pytorch.loggers import Logger
+from omegaconf import DictConfig
 
+root = pyrootutils.setup_root(
+    search_from=__file__,
+    indicator=[".git", "pyproject.toml"],
+    pythonpath=True,
+    dotenv=True,
+)
 from src import utils
 
 # --------------------------------------------------------------------------- #
@@ -44,12 +50,6 @@ from src import utils
 # --------------------------------------------------------------------------- #
 
 
-root = pyrootutils.setup_root(
-    search_from=__file__,
-    indicator=[".git", "pyproject.toml"],
-    pythonpath=True,
-    dotenv=True,
-)
 _HYDRA_PARAMS = {
     "version_base": "1.3",
     "config_path": str(root / "configs"),
@@ -101,9 +101,7 @@ def train(cfg: DictConfig) -> Tuple[dict, dict]:
 
     # Init loggers
     log.info("Instantiating loggers...")
-    logger: List[LightningLoggerBase] = utils.instantiate_loggers(
-        cfg.get("logger")
-    )
+    logger: List[Logger] = utils.instantiate_loggers(cfg.get("logger"))
 
     # Init lightning ddp plugins
     log.info("Instantiating plugins...")

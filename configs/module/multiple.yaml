@@ -9,7 +9,7 @@ _target_: src.modules.multiple_module.MultipleLitModule
 
 defaults:
   - _self_
-  - network: classification_multiple.yaml
+  - network: classification_multiple
 
 optimizer:
   _target_: torch.optim.Adam
