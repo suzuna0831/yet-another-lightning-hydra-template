@@ -3,9 +3,11 @@ import datetime
 import math
 import os
 import time
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
 
-from pytorch_lightning.callbacks import ProgressBarBase
+import lightning.pytorch as pl
+from lightning.pytorch.callbacks import ProgressBar
+from torch import Tensor
 
 
 def n_lines(text: str) -> int:
@@ -276,7 +278,7 @@ class TimeEstimator:
         return f"[{elapsed}>{eta}]"
 
 
-class LightProgressBar(ProgressBarBase):
+class LightProgressBar(ProgressBar):
     def __init__(self) -> None:
         super().__init__()
         self.last_epoch = 0
@@ -293,9 +295,10 @@ class LightProgressBar(ProgressBarBase):
     def enable(self) -> None:
         self.enable = True
 
-    def on_train_epoch_start(self, *args: Any, **kwargs: Any) -> None:
+    def on_train_epoch_start(
+        self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
+    ) -> None:
         self.timer.reset()
-        trainer = args[0]
         log = copy.deepcopy(trainer.logged_metrics)
         if "epoch" in log:
             log["Info/epoch"] = copy.deepcopy(log["epoch"])
@@ -306,8 +309,9 @@ class LightProgressBar(ProgressBarBase):
         self.pbar.update(log)
         self.pbar.update(trainer.logged_metrics)
 
-    def on_train_epoch_end(self, *args: Any, **kwargs: Any) -> None:
-        trainer = args[0]
+    def on_train_epoch_end(
+        self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
+    ) -> None:
         log = copy.deepcopy(trainer.logged_metrics)
         if "epoch" in log:
             log["Info/epoch"] = copy.deepcopy(log["epoch"])
@@ -319,10 +323,14 @@ class LightProgressBar(ProgressBarBase):
         self.pbar.update(trainer.logged_metrics)
 
     def step(
-        self, part: str, batch_idx: int, total_batches: int, *args: Any
+        self,
+        trainer,
+        part: str,
+        batch_idx: int,
+        total_batches: int,
+        *args: Any,
     ) -> None:
         self.timer.update(float(batch_idx) / float(total_batches))
-        trainer = args[0]
         log = copy.deepcopy(trainer.logged_metrics)
         if "epoch" in log:
             log["Info/epoch"] = copy.deepcopy(log["epoch"])
@@ -335,15 +343,23 @@ class LightProgressBar(ProgressBarBase):
         log["Info/Time"] = str(self.timer)
         self.pbar.update(log)
 
-    def on_train_batch_end(self, *args: Any, **kwargs: Any) -> None:
-        super().on_train_batch_end(*args, **kwargs)
-        self.step(
-            "train", self.train_batch_idx, self.total_train_batches, *args
+    def on_train_batch_end(
+        self,
+        trainer: "pl.Trainer",
+        pl_module: "pl.LightningModule",
+        outputs: Optional[Union[Tensor, Mapping[str, Any]]],
+        batch: Any,
+        batch_idx: int,
+    ) -> None:
+        super().on_train_batch_end(
+            trainer, pl_module, outputs, batch, batch_idx
         )
+        self.step(trainer, "train", batch_idx, len(trainer.train_dataloader))
 
-    def on_validation_epoch_start(self, *args: Any, **kwargs: Any) -> None:
+    def on_validation_epoch_start(
+        self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"
+    ) -> None:
         self.timer.reset()
-        trainer = args[0]
         log = trainer.logged_metrics
         if "epoch" in log:
             log["Info/epoch"] = copy.deepcopy(log["epoch"])
@@ -354,18 +370,21 @@ class LightProgressBar(ProgressBarBase):
         self.pbar.update(log)
         self.pbar.update(trainer.logged_metrics)
 
-    def on_validation_epoch_end(self, *args: Any, **kwargs: Any) -> None:
-        trainer = args[0]
-        log = copy.deepcopy(trainer.logged_metrics)
-        if "epoch" in log:
-            log["Info/epoch"] = copy.deepcopy(log["epoch"])
-            del log["epoch"]
-        log["Info/Mode"] = "val"
-        log["Info/Progress"] = progress_str(15, 1.0)
-        log["Info/Time"] = str(self.timer)
-        self.pbar.update(log)
-        self.pbar.update(trainer.logged_metrics)
-
-    def on_validation_batch_end(self, *args: Any, **kwargs: Any) -> None:
-        super().on_validation_batch_end(*args, **kwargs)
-        self.step("val", self.val_batch_idx, self.total_val_batches, *args)
+    def on_validation_batch_end(
+        self,
+        trainer: "pl.Trainer",
+        pl_module: "pl.LightningModule",
+        outputs: Optional[Union[Tensor, Mapping[str, Any]]],
+        batch: Any,
+        batch_idx: int,
+        dataloader_idx: int = 0,
+    ) -> None:
+        super().on_validation_batch_end(
+            trainer, pl_module, outputs, batch, batch_idx, dataloader_idx
+        )
+        total_batches = (
+            len(trainer.val_dataloaders[dataloader_idx])
+            if isinstance(trainer.val_dataloaders, list)
+            else len(trainer.val_dataloaders)
+        )
+        self.step(trainer, "val", batch_idx, total_batches)

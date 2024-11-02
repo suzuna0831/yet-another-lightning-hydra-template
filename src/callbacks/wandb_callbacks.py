@@ -2,9 +2,9 @@ from pathlib import Path
 from subprocess import check_output, run  # nosec B404, B603, B607
 
 import wandb
-from pytorch_lightning import Callback, Trainer
-from pytorch_lightning.loggers import WandbLogger
-from pytorch_lightning.utilities import rank_zero_only
+from lightning import Callback, Trainer
+from lightning.pytorch.loggers import WandbLogger
+from lightning.utilities import rank_zero_only
 
 
 def get_wandb_logger(trainer: Trainer) -> WandbLogger:

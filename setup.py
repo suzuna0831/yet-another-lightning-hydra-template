@@ -5,7 +5,7 @@ setup(
     version="0.1.0",
     description=(
         "Deep Learning training pipeline template"
-        "based on pytorch_lightning and hydra"
+        "based on lightning and hydra"
     ),
     author="Your Name",
     author_email="Your Email",

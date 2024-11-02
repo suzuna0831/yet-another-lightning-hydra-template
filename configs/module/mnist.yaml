@@ -11,7 +11,7 @@ _target_: src.modules.single_module.MNISTLitModule
 
 defaults:
   - _self_
-  - network: mnist.yaml
+  - network: mnist
 
 optimizer:
   _target_: torch.optim.Adam

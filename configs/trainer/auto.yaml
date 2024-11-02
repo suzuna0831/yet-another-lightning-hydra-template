@@ -1,0 +1,41 @@
+_target_: lightning.pytorch.trainer.Trainer
+
+accelerator: auto # (Union[str, Accelerator]) – "cpu", "gpu", "tpu", "hpu", "mps", "auto". Default: "auto".
+strategy: auto # (Union[str, Strategy]) – Default: "auto".
+devices: auto # (Union[List[int], str, int]) – Default: "auto".
+num_nodes: 1 # (int) – Default: 1.
+precision: 32-true # (Union[Literal[64, 32, 16], Literal['transformer-engine', 'transformer-engine-float16', '16-true', '16-mixed', 'bf16-true', 'bf16-mixed', '32-true', '64-true'], Literal['64', '32', '16', 'bf16'], None]) – Default: '32-true'.
+logger: True # (Union[Logger, Iterable[Logger], bool, None]) – Default: True.
+callbacks: null # (Union[List[Callback], Callback, None]) – Default: None.
+fast_dev_run: False # (Union[int, bool]) – Default: False.
+max_epochs: null # (Optional[int]) – Default: None.
+min_epochs: null # (Optional[int]) – Default: None.
+max_steps: -1 # (int) – Default: -1.
+min_steps: null # (Optional[int]) – Default: None.
+max_time: null # (Union[str, timedelta, Dict[str, int], None]) – Default: None.
+limit_train_batches: 1.0 # (Union[int, float, None]) – Default: 1.0.
+limit_val_batches: 1.0 # (Union[int, float, None]) – Default: 1.0.
+limit_test_batches: 1.0 # (Union[int, float, None]) – Default: 1.0.
+limit_predict_batches: 1.0 # (Union[int, float, None]) – Default: 1.0.
+overfit_batches: 0.0 # (Union[int, float]) – Default: 0.0.
+val_check_interval: 1.0 # (Union[int, float, None]) – Default: 1.0.
+check_val_every_n_epoch: 1 # (Optional[int]) – Default: 1.
+num_sanity_val_steps: 2 # (Optional[int]) – Default: 2.
+log_every_n_steps: 50 # (Optional[int]) – Default: 50.
+enable_checkpointing: True # (Optional[bool]) – Default: True.
+enable_progress_bar: True # (Optional[bool]) – Default: True.
+enable_model_summary: True # (Optional[bool]) – Default: True.
+accumulate_grad_batches: 1 # (int) – Default: 1.
+gradient_clip_val: null # (Union[int, float, None]) – Default: None.
+gradient_clip_algorithm: norm # (Optional[str]) – Default: None.
+deterministic: null # (Union[bool, Literal['warn'], None]) – Default: None.
+benchmark: null # (Optional[bool]) – Default: None.
+inference_mode: False # (bool) – Default: False.
+use_distributed_sampler: False # (bool) – Default: False.
+profiler: null # (Union[Profiler, str, None]) – Default: None.
+detect_anomaly: False # (bool) – Default: False.
+barebones: False # (bool) – Default: False.
+plugins: null # (Union[Precision, ClusterEnvironment, CheckpointIO, LayerSync, List[Union[Precision, ClusterEnvironment, CheckpointIO, LayerSync]], None]) – Default: None.
+sync_batchnorm: False # (bool) – Default: False.
+reload_dataloaders_every_n_epochs: 0 # (int) – Default: 0.
+default_root_dir: null # (Union[str, Path, None]) – Default: os.getcwd().

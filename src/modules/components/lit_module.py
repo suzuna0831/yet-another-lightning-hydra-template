@@ -2,8 +2,8 @@ from typing import Any
 
 import hydra
 import torch
+from lightning import LightningModule
 from omegaconf import DictConfig
-from pytorch_lightning import LightningModule
 
 
 class BaseLitModule(LightningModule):
@@ -23,8 +23,8 @@ class BaseLitModule(LightningModule):
             optimizer (DictConfig): Optimizer config.
             scheduler (DictConfig): Scheduler config.
             logging (DictConfig): Logging config.
-            args (Any): Additional arguments for pytorch_lightning.LightningModule.
-            kwargs (Any): Additional keyword arguments for pytorch_lightning.LightningModule.
+            args (Any): Additional arguments for lightning.LightningModule.
+            kwargs (Any): Additional keyword arguments for lightning.LightningModule.
         """
 
         super().__init__(*args, **kwargs)
@@ -38,7 +38,7 @@ class BaseLitModule(LightningModule):
 
     def configure_optimizers(self) -> Any:
         optimizer: torch.optim = hydra.utils.instantiate(
-            self.opt_params, params=self.parameters(), _convert_="partial"
+            self.opt_params, self.parameters(), _convert_="partial"
         )
         if self.slr_params.get("scheduler"):
             scheduler: torch.optim.lr_scheduler = hydra.utils.instantiate(
